@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+        <record id="medical_appointment_view_tree" model="ir.ui.view">
+            <field name="name">medical.appointment.tree</field>
+            <field name="model">medical.appointment</field>
+            <field name="priority" eval="8" />
+            <field name="arch" type="xml">
+                <tree string="Medical Appointment" colors="red:stage_id=='APSP004';green:stage_id=='APSP001';orange:stage_id=='APSP002';blue:stage_id=='APSP003'">
+                    <field name="name" />
+                    <field name="patient_id" />
+                    <field name="alias" />
+                    <field name="urgency" />
+                    <field name="appointment_date" />
+                    <field name="physician_id" />
+                    <!--<field name="specialty_id" />-->
+                    <field name="appointment_type" />
+                    <field name="institution_id" />
+                    <field name="stage_id" />
+                </tree>
+            </field>
+        </record>
+
+        <record id="medical_appointment_view_form" model="ir.ui.view">
+            <field name="name">medical.appointment.form</field>
+            <field name="model">medical.appointment</field>
+            <field name="priority" eval="8" />
+            <field name="arch" type="xml">
+                <form string="Medical Appointment"  version="7.0">
+                    <header>
+                        <button name="action_create_visit" string="Create Visit" class="btn-primary" type="object" attrs="{'invisible': ['|','|',('appointment_type','!=','outpatient'),('current_stage','!=',2)]}" />
+                        <!--<button name="action_create_hospitalization" string="Create Hospitalization" class="btn-primary" type="object" attrs="{'invisible': ['|','|',('appointment_type','!=','inpatient'),('current_stage','!=',2)]}" />-->
+                        <field name="stage_id" widget="statusbar" clickable="True"
+                                options="{'fold_field': 'fold'}"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title" name="title">
+                            <label for="name" class="edit_only" />
+                            <h1><field name="name" readonly="1"/></h1>
+                        </div>
+
+                        <div class="oe_right oe_button_box" name="buttons"/>
+                        <group col="4" colspan="4">
+                            <field name="patient_id"/>
+                            <field name="alias" />
+                            <field name="appointment_type" />
+                            <field name="urgency" />
+                            <field name="current_stage" invisible="1" />
+                        </group>
+                        <notebook>
+                            <page string="Main">
+                                <group >
+                                    <group> 
+                                        <field name="physician_id" />
+                                        <field name="specialty_id" />
+                                        <field name="institution_id" />
+                                    </group>
+                                    <group>
+                                        <field name="consultations" />
+                                        <field name="appointment_date"/>
+                                        <field name="duration" widget="float_time"/>
+                                    </group>
+                                </group>
+                                <group col="4" colspan="4" string="Notes">
+                                    <field name="comments" colspan="4" nolabel="1"/>
+                                </group>
+                            </page>
+                            <page string="History">
+                                <field name="history_ids" nolabel="1" readonly="1">
+                                    <tree string="History">
+                                        <field name="date" />
+                                        <field name="name" />
+                                        <field name="action" />
+                                    </tree>
+                                    <form String="History">
+                                        <field name="name" />
+                                    </form>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="medical_appointment_view_calendar" model="ir.ui.view">
+            <field name="name">medical.appointment.calendar</field>
+            <field name="model">medical.appointment</field>
+            <field eval="2" name="priority"/>
+            <field name="arch" type="xml">
+                <calendar color="physician_id" date_start="appointment_date" date_delay="duration" string="Calendar View" mode="week" >
+                    <field name="patient_id"/>
+                    <field name="physician_id"/>
+                    <field name="duration"/>
+                </calendar>
+            </field>
+        </record>
+
+        <record id="medical_appointment_view_search" model="ir.ui.view">
+            <field name="name">medical.appointment.search</field>
+            <field name="model">medical.appointment</field>
+            <field name="priority" eval="8" />
+            <field name="arch" type="xml">
+                <search string="Medical Appointment">
+                    <field name="name" />
+                    <field name="patient_id" />
+                    <field name="physician_id" />
+                    <field name="appointment_date" />
+                    <field name="appointment_type" />
+                    <field name="urgency" />
+                    <field name="consultations" />
+                    <field name="institution_id" />
+                    <field name="specialty_id" />
+                    <newline />
+                    <group expand="0" string="Group By...">
+                        <filter string="Consultation Services" domain="[]"
+                            context="{'group_by':'consultations'}" />
+                        <filter string="Patient" domain="[]" context="{'group_by':'patient_id'}" />
+                        <filter string="Appointment ID" domain="[]"
+                            context="{'group_by':'name'}" />
+                        <filter string="Date and Time" domain="[]"
+                            context="{'group_by':'appointment_date'}" />
+                        <filter string="Physician" domain="[]" context="{'group_by':'physician_id'}" />
+                        <filter string="Comments" domain="[]" context="{'group_by':'comments'}" />
+                        <filter string="Health Center" domain="[]"
+                            context="{'group_by':'institution_id'}" />
+                        <filter string="Specialty" domain="[]"
+                            context="{'group_by':'specialty_id'}" />
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="medical_appointment_view_kanban">
+            <field name="name">medical.appointement.kanban</field>
+            <field name="model">medical.appointment</field>
+            <field name="type">kanban</field>
+            <field name="arch" type="xml">
+                <kanban class="background_grey" default_group_by="stage_id">
+                    <field name="stage_id"/>
+                    <field name="name"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="kanban_content oe_kanban_global_click ">
+                                <div class="kanban_vignette semantic_html_override">
+                                    <div class="kanban_details">
+                                        <h3>
+                                            <a type="open"><field name="name"/></a>
+                                        </h3>
+                                        <ul>
+                                            <li t-if="record.patient_id.raw_value"><b>Patient:</b> <field name="patient_id"/></li>
+                                            <li t-if="record.physician_id.raw_value"><b>Physician:</b> <field name="physician_id"/></li>
+                                            <li t-if="record.appointment_date.raw_value"><b>Date and Time:</b> <field name="appointment_date"/></li>
+                                            <li t-if="record.duration.raw_value"><b>Duration:</b> <field name="duration"/></li>
+                                            <li t-if="record.urgency.raw_value"><b>Urgency:</b> <field name="urgency"/></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="medical_appointment_action">
+            <field name="name">Appointments</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">medical.appointment</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">kanban,tree,form,calendar</field>
+            <field name="search_view_id" ref="medical_appointment_view_search" />
+            <field name="context">{}</field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="medical_appointment_action_form">
+            <field name="act_window_id" ref="medical_appointment_action" />
+            <field name="sequence" eval="40" />
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="medical_appointment_view_form" />
+        </record>
+
+        <record model="ir.actions.act_window.view" id="medical_appointment_action_tree">
+            <field name="act_window_id" ref="medical_appointment_action" />
+            <field name="sequence" eval="30" />
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="medical_appointment_view_tree" />
+        </record>
+
+        <record model="ir.actions.act_window.view" id="medical_appointment_action_calendar">
+            <field name="act_window_id" ref="medical_appointment_action" />
+            <field name="sequence" eval="20" />
+            <field name="view_mode">calendar</field>
+            <field name="view_id" ref="medical_appointment_view_calendar" />
+        </record>
+
+         <record model="ir.actions.act_window.view" id="medical_appointment_action_kanban">
+             <field name="act_window_id" ref="medical_appointment_action" />
+             <field name="sequence" eval="10" />
+             <field name="view_mode">kanban</field>
+             <field name="view_id" ref="medical_appointment_view_kanban" />
+         </record>
+
+         <!-- Appointment Button -->
+         <record id="medical_appointment_patient_view_form" model="ir.ui.view">
+            <field name="name">medical.patient.form.appointment</field>
+            <field name="model">medical.patient</field>
+            <field name="inherit_id" ref="medical_base.medical_patient_view_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <button name="%(medical_appointment_action)d" type="action" class="oe_stat_button" icon="fa-calendar" context="{'search_default_patient_id': active_id}" string="Appointments"></button>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</openerp>
