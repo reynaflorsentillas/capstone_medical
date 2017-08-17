@@ -28,7 +28,8 @@
             <field name="arch" type="xml">
                 <form string="Medical Appointment"  version="7.0">
                     <header>
-                        <button name="action_create_visit" string="Create Visit" class="btn-primary" type="object" attrs="{'invisible': ['|','|',('appointment_type','!=','outpatient'),('current_stage','!=',2)]}" />
+                        <!-- TO BE MOVE TO THE RESPECTIVE MODULE -->
+                        <!--<button name="action_create_visit" string="Create Visit" class="btn-primary" type="object" attrs="{'invisible': ['|','|',('appointment_type','!=','outpatient'),('current_stage','!=',2)]}" />-->
                         <!--<button name="action_create_hospitalization" string="Create Hospitalization" class="btn-primary" type="object" attrs="{'invisible': ['|','|',('appointment_type','!=','inpatient'),('current_stage','!=',2)]}" />-->
                         <field name="stage_id" widget="statusbar" clickable="True"
                                 options="{'fold_field': 'fold'}"/>
@@ -73,12 +74,20 @@
                                         <field name="action" />
                                     </tree>
                                     <form String="History">
-                                        <field name="name" />
+                                        <group>
+                                            <field name="date" />
+                                            <field name="name" />
+                                            <field name="action" />
+                                        </group>
                                     </form>
                                 </field>
                             </page>
                         </notebook>
                     </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
                 </form>
             </field>
         </record>

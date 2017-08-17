@@ -130,8 +130,6 @@ class MedicalAppointment(models.Model):
             'action' : "----  Created  ----"
         }) 
 
-        # values['history_ids'] = appointment_history
-    
         return result
 
     @api.onchange('physician_id')
@@ -139,6 +137,7 @@ class MedicalAppointment(models.Model):
         for r in self:
             r.specialty_id = r.physician_id.specialty_id
 
+    # TO BE MOVED TO VISIT MODULE
     @api.multi
     def action_create_visit(self):
         for record in self:
@@ -168,64 +167,59 @@ class MedicalAppointment(models.Model):
                     'target': 'current',
                 }
 
-    # @api.multi
-    # def action_create_hospitalization(self):
-    #     for record in self:
-    #         if record.appointment_type == 'inpatient':
-    #             hospitalization_id = self.env['medical.patient.hospitalization'].create({
-    #                 ''
-    #             })
-    #         return True
+    # TO BE MOVED TO HOSPITALIZATION MODULE
+    @api.multi
+    def action_create_hospitalization(self):
+        for record in self:
+            if record.appointment_type == 'inpatient':
+                hospitalization_id = self.env['medical.patient.hospitalization'].create({
+                    ''
+                })
+            return True
 
-    # def write(self, cr, uid, ids, vals, context=None):
-    #     if context is None:
-    #         context = {}
-    #     else:
-    #         context = context.copy()
+    def write(self, values):
+        # original_values = self.read(cr, uid, ids, ['physician_id', 'institution_id', 'appointment_date', 'date_end', 'duration'], context=context)[0]
+        # date_start = vals.get('appointment_date', original_values['appointment_date'])
+        result = super(MedicalAppointment, self).write(values)
 
-    #     original_values = self.read(cr, uid, ids, ['physician_id', 'institution_id', 'appointment_date', 'date_end', 'duration'], context=context)[0]
-    #     date_start = vals.get('appointment_date', original_values['appointment_date'])
-    #     result = super(MedicalAppointment, self).write(cr, uid, ids, vals, context=context)
+        # stage change: update date_last_stage_update
+        if 'stage_id' in values:
+            appointment_history = self.env['medical.appointment.history']
+            stage_id = self.env['medical.appointment.stage'].search([('id', '=', values['stage_id'])])
+            # stage_name = stage_proxy.name_get(values['stage_id'])
+            # ### update history and any other for stage_id.onchange....
+            val_history = {
+                'action': "----  Changed to {0}  ----".format(stage_id.name),
+                'appointment_id': self.id,
+                'date': time.strftime('%Y-%m-%d %H:%M:%S'),
+            }
+            appointment_history.create(val_history)
 
-    #     # stage change: update date_last_stage_update
-    #     if 'stage_id' in vals:
-    #         ait_obj = self.pool['medical.appointment.history']
-    #         stage_proxy = self.pool['medical.appointment.stage']
-    #         stage_name = stage_proxy.name_get(cr, uid, vals['stage_id'], context=context)[0][1]
-    #         # ### update history and any other for stage_id.onchange....
-    #         val_history = {
-    #             'action': "----  Changed to {0}  ----".format(stage_name),
-    #             'appointment_id_history': ids[0],
-    #             'name': uid,
-    #             'date': time.strftime('%Y-%m-%d %H:%M:%S'),
-    #         }
-    #         ait_obj.create(cr, uid, val_history)
+            # user_record = self.pool['res.users'].browse(cr, SUPERUSER_ID, uid)
+            # lang_id = self.pool['res.lang'].search(cr, SUPERUSER_ID, [('code', '=', user_record.lang)])
+            # lang_record = self.pool['res.lang'].browse(cr, SUPERUSER_ID, lang_id)[0]
 
-    #         user_record = self.pool['res.users'].browse(cr, SUPERUSER_ID, uid)
-    #         lang_id = self.pool['res.lang'].search(cr, SUPERUSER_ID, [('code', '=', user_record.lang)])
-    #         lang_record = self.pool['res.lang'].browse(cr, SUPERUSER_ID, lang_id)[0]
+            # localized_datetime = fields.datetime.context_timestamp(cr, uid, datetime.strptime(date_start, DEFAULT_SERVER_DATETIME_FORMAT), context=context)
+            # context['appointment_date'] = localized_datetime.strftime(lang_record.date_format)
+            # context['appointment_time'] = localized_datetime.strftime(lang_record.time_format)
 
-    #         localized_datetime = fields.datetime.context_timestamp(cr, uid, datetime.strptime(date_start, DEFAULT_SERVER_DATETIME_FORMAT), context=context)
-    #         context['appointment_date'] = localized_datetime.strftime(lang_record.date_format)
-    #         context['appointment_time'] = localized_datetime.strftime(lang_record.time_format)
+            # email_template_name = None
 
-    #         email_template_name = None
+            # if stage_name == 'Pending Review':
+            #     # Should create template and change name here
+            #     email_template_name = 'email_template_appointment_confirmation'
+            # elif stage_name == 'Confirm':
+            #     email_template_name = 'email_template_appointment_confirmation'
+            # elif stage_name == 'Canceled':
+            #     # Should create template and change name here
+            #     email_template_name = 'email_template_appointment_confirmation'
 
-    #         if stage_name == 'Pending Review':
-    #             # Should create template and change name here
-    #             email_template_name = 'email_template_appointment_confirmation'
-    #         elif stage_name == 'Confirm':
-    #             email_template_name = 'email_template_appointment_confirmation'
-    #         elif stage_name == 'Canceled':
-    #             # Should create template and change name here
-    #             email_template_name = 'email_template_appointment_confirmation'
+            # if email_template_name:
+            #     email_template_proxy = self.pool['email.template']
+            #     template_id = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'medical', email_template_name)[1]
+            #     map(lambda t: email_template_proxy.send_mail(cr, uid, template_id, t, True, context=context),ids)
 
-    #         if email_template_name:
-    #             email_template_proxy = self.pool['email.template']
-    #             template_id = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'medical', email_template_name)[1]
-    #             map(lambda t: email_template_proxy.send_mail(cr, uid, template_id, t, True, context=context),ids)
-
-    #     return result
+        return result
 
 class MedicalAppointmentHistory(models.Model):
     _name = 'medical.appointment.history'

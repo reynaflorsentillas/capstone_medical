@@ -7,15 +7,26 @@
             <field name="priority" eval="8" />
             <field name="inherit_id" ref="product.product_normal_form_view"/>
             <field name="arch" type="xml">
-                    <label for="sale_ok" position="after">
-                            <group colspan="2" col="6">
-                                <field name="is_insurance_plan" />
+                <notebook position="inside">
+                    <page string="Medical">
+                        <group>
+                            <group>
+                                <div>
+                                    <field name="is_insurance_plan" />
+                                    <label for="is_insurance_plan"/>
+                                </div>
                             </group>
-                            <group colspan="2" col="4">
+                            <group>
+                                <div>
                                 <field name="is_medical_supply" />
+                                <label for="is_medical_supply"/>
                                 <field name="is_vaccine" />
+                                <label for="is_vaccine"/>
+                            </div>
                             </group>
-                    </label>
+                        </group>
+                    </page>
+                </notebook>
             </field>
         </record>
 
