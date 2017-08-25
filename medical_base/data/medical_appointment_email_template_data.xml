@@ -1,0 +1,178 @@
+<?xml version="1.0"?>
+<openerp>
+    <data noupdate="0">
+
+        <!--Email template -->
+        <record id="email_template_appointment_confirmation" model="mail.template">
+            <field name="name">Appointment Confirmation - Email</field>
+            <field name="email_from"><![CDATA[${object.institution_id.name} <${(object.institution_id.email or user.email)|safe}>]]></field>
+            <field name="subject"><![CDATA[${object.institution_id.name} <${(object.institution_id.email or user.email)|safe}>]]> - Appointment Confirmation</field>
+            <field name="email_to">${object.patient_id.email}</field>
+            <field name="model_id" ref="medical_base.model_medical_appointment"/>
+            <field name="auto_delete" eval="True"/>
+            <field name="lang">${object.patient_id.partner_id.lang}</field>
+            <field name="body_html"><![CDATA[
+                <div class="content-wrapper" style="max-width:650px;">
+                    <div class="col-sm-12 highlight">
+                        <p> <b>Dear ${object.patient_id.name},</b> </p>
+                        <p>Your appointment have been confirmed.</p>
+                        <div class="row"></div>
+
+                        <div class="col-sm-8 highlight">
+                            <table class="table">
+                                <tr>
+                                    <td>Doctor: </td>
+                                    <td><b>${object.physician_id.name}</b></td>
+                                </tr>
+                                <tr>
+                                    <td>Date: </td>
+                                    <td><b>${ctx.get('appointment_date') or object.appointment_date[:10]}</b><img class="img-responsive" style="float:right;" src="http://agendese.com/website/static/src/img/Agendese/Banners/calendar.png"></td>
+                                </tr>
+                                <tr>
+                                    <td>Time: </td>
+                                    <td><b>${ctx.get('appointment_time') or object.appointment_date[11:]}</b></td>
+                                </tr>
+                                <tr>
+                                    <td>Clinic: </td>
+                                    <td><b>${object.institution_id.name}</b></td>
+                                </tr>
+                                <tr>
+                                    <td>Phone: </td>
+                                    <td><b>${object.institution_id.phone}</b></td>
+                                </tr>
+                                <tr>
+                                    <td>Address: </td>
+                                    <td><b>${object.institution_id.street} ${object.institution_id.street2}</b></td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <div class="row"></div>
+
+                        <p>Best Regards,</p>
+                        <p>${object.institution_id.name} Team</p>
+                    </div>
+                </div>
+            ]]></field>
+        </record>
+
+        <record id="email_template_appointment_pending_review" model="mail.template">
+            <field name="name">Appointment Pending Review - Email</field>
+            <field name="email_from"><![CDATA[${object.institution_id.name} <${(object.institution_id.email or user.email)|safe}>]]></field>
+            <field name="subject"><![CDATA[${object.institution_id.name} <${(object.institution_id.email or user.email)|safe}>]]> - Appointment Pending Review</field>
+            <field name="email_to">${object.patient_id.email}</field>
+            <field name="model_id" ref="medical_base.model_medical_appointment"/>
+            <field name="auto_delete" eval="True"/>
+            <field name="lang">${object.patient_id.partner_id.lang}</field>
+            <field name="body_html"><![CDATA[
+                <div class="content-wrapper" style="max-width:650px;">
+                    <div class="col-sm-12 highlight">
+                        <p> <b>Dear ${object.patient_id.name},</b> </p>
+                        <p>Your appointment ${object.name} is pending for review.</p>
+                        <div class="row"></div>
+                        <div class="col-sm-8 highlight">
+                            <table class="table">
+                                <tr>
+                                    <td>Doctor: </td>
+                                    <td><b>${object.physician_id.name}</b></td>
+                                </tr>
+                                <tr>
+                                    <td>Date: </td>
+                                    <td><b>${ctx.get('appointment_date') or object.appointment_date[:10]}</b><img class="img-responsive" style="float:right;" src="http://agendese.com/website/static/src/img/Agendese/Banners/calendar.png"></td>
+                                </tr>
+                                <tr>
+                                    <td>Time: </td>
+                                    <td><b>${ctx.get('appointment_time') or object.appointment_date[11:]}</b></td>
+                                </tr>
+                                <tr>
+                                    <td>Clinic: </td>
+                                    <td><b>${object.institution_id.name}</b></td>
+                                </tr>
+                                <tr>
+                                    <td>Phone: </td>
+                                    <td><b>${object.institution_id.phone}</b></td>
+                                </tr>
+                                <tr>
+                                    <td>Address: </td>
+                                    <td><b>${object.institution_id.street} ${object.institution_id.street2}</b></td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <div class="row"></div>
+                        
+                        <p>Best Regards,</p>
+                        <p>${object.institution_id.name} Team</p>
+                    </div>
+                </div>
+            ]]></field>
+        </record>
+
+        <record id="email_template_appointment_canceled" model="mail.template">
+            <field name="name">Appointment Cancellation - Email</field>
+            <field name="email_from"><![CDATA[${object.institution_id.name} <${(object.institution_id.email or user.email)|safe}>]]></field>
+            <field name="subject"><![CDATA[${object.institution_id.name} <${(object.institution_id.email or user.email)|safe}>]]> - Appointment Cancellation</field>
+            <field name="email_to">${object.patient_id.email}</field>
+            <field name="model_id" ref="medical_base.model_medical_appointment"/>
+            <field name="auto_delete" eval="True"/>
+            <field name="lang">${object.patient_id.partner_id.lang}</field>
+            <field name="body_html"><![CDATA[
+                <div class="content-wrapper" style="max-width:650px;">
+                    <div class="col-sm-12 highlight">
+                        <p> <b>Dear ${object.patient_id.name},</b> </p>
+                        <p>Your appointment ${object.name} have been cancelled.</p>
+                        <div class="row"></div>
+                        <div class="col-sm-8 highlight">
+                            <table class="table">
+                                <tr>
+                                    <td>Doctor: </td>
+                                    <td><b>${object.physician_id.name}</b></td>
+                                </tr>
+                                <tr>
+                                    <td>Date: </td>
+                                    <td><b>${ctx.get('appointment_date') or object.appointment_date[:10]}</b><img class="img-responsive" style="float:right;" src="http://agendese.com/website/static/src/img/Agendese/Banners/calendar.png"></td>
+                                </tr>
+                                <tr>
+                                    <td>Time: </td>
+                                    <td><b>${ctx.get('appointment_time') or object.appointment_date[11:]}</b></td>
+                                </tr>
+                                <tr>
+                                    <td>Clinic: </td>
+                                    <td><b>${object.institution_id.name}</b></td>
+                                </tr>
+                                <tr>
+                                    <td>Phone: </td>
+                                    <td><b>${object.institution_id.phone}</b></td>
+                                </tr>
+                                <tr>
+                                    <td>Address: </td>
+                                    <td><b>${object.institution_id.street} ${object.institution_id.street2}</b></td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <div class="row"></div>
+                        
+                        <p>Best Regards,</p>
+                        <p>${object.institution_id.name} Team</p>
+                    </div>
+                </div>
+            ]]></field>
+        </record>
+
+        <!-- SMS Template -->
+        <record id="sms_template_appointment_confirmation" model="mail.template">
+            <field name="name">Appointment Confirmation - SMS</field>
+            <field name="email_from"><![CDATA[${object.institution_id.name}]]></field>
+            <field name="subject"><![CDATA[${object.institution_id.name}]]>  -  Appointment Confirmation</field>
+            <field name="email_to">${object.patient_id.mobile}</field>
+            <field name="model_id" ref="medical_base.model_medical_appointment"/>
+            <field name="auto_delete" eval="True"/>
+            <field name="lang">${object.patient_id.partner_id.lang}</field>
+            <field name="body_html">
+                <![CDATA[<p>Your appointment with Dr. ${object.physician_id.lastname} on ${ctx.get('appointment_date') or object.appointment_date[:10]} ${ctx.get('appointment_time') or object.appointment_date[11:]} has been confirmed.</p>]]>
+            </field>
+        </record>
+        
+    </data>
+</openerp>

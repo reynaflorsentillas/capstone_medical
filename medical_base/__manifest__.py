@@ -34,6 +34,7 @@
         'data/medical_specialty_data.xml',
         'data/medical_ethnic_group_data.xml',
         'data/medical_appointment_stage_data.xml',
+        'data/medical_appointment_email_template_data.xml',
         'views/res_partner_view.xml',
         'views/product_product_view.xml',
         'views/medical_specialty_view.xml',

@@ -7,9 +7,7 @@ import time
 from datetime import datetime
 
 import logging
-
 _logger = logging.getLogger(__name__)
-
 
 class MedicalAppointmentStage(models.Model):
     # """ Model for case stages. This models the main stages of an appointment
@@ -178,16 +176,15 @@ class MedicalAppointment(models.Model):
             return True
 
     def write(self, values):
-        # original_values = self.read(cr, uid, ids, ['physician_id', 'institution_id', 'appointment_date', 'date_end', 'duration'], context=context)[0]
-        # date_start = vals.get('appointment_date', original_values['appointment_date'])
+        # original_values = self.read(['physician_id', 'institution_id', 'appointment_date', 'date_end', 'duration'])[0]
+        # date_start = values.get('appointment_date', original_values['appointment_date'])
+        # _logger.info('KIMCHI')
         result = super(MedicalAppointment, self).write(values)
 
         # stage change: update date_last_stage_update
         if 'stage_id' in values:
             appointment_history = self.env['medical.appointment.history']
             stage_id = self.env['medical.appointment.stage'].search([('id', '=', values['stage_id'])])
-            # stage_name = stage_proxy.name_get(values['stage_id'])
-            # ### update history and any other for stage_id.onchange....
             val_history = {
                 'action': "----  Changed to {0}  ----".format(stage_id.name),
                 'appointment_id': self.id,
@@ -195,29 +192,32 @@ class MedicalAppointment(models.Model):
             }
             appointment_history.create(val_history)
 
-            # user_record = self.pool['res.users'].browse(cr, SUPERUSER_ID, uid)
-            # lang_id = self.pool['res.lang'].search(cr, SUPERUSER_ID, [('code', '=', user_record.lang)])
-            # lang_record = self.pool['res.lang'].browse(cr, SUPERUSER_ID, lang_id)[0]
+            # user_record = self.env['res.users'].browse(SUPERUSER_ID)
+            # lang_id = self.env['res.lang'].browse(SUPERUSER_ID, [('code', '=', user_record.lang)])
+            # lang_record = self.env['res.lang'].browse(SUPERUSER_ID, lang_id)[0]
 
-            # localized_datetime = fields.datetime.context_timestamp(cr, uid, datetime.strptime(date_start, DEFAULT_SERVER_DATETIME_FORMAT), context=context)
+            # localized_datetime = fields.Datetime.context_timestamp(datetime.strptime(date_start, DEFAULT_SERVER_DATETIME_FORMAT))
             # context['appointment_date'] = localized_datetime.strftime(lang_record.date_format)
             # context['appointment_time'] = localized_datetime.strftime(lang_record.time_format)
 
-            # email_template_name = None
+            mail_template_name = None
 
-            # if stage_name == 'Pending Review':
-            #     # Should create template and change name here
-            #     email_template_name = 'email_template_appointment_confirmation'
-            # elif stage_name == 'Confirm':
-            #     email_template_name = 'email_template_appointment_confirmation'
-            # elif stage_name == 'Canceled':
-            #     # Should create template and change name here
-            #     email_template_name = 'email_template_appointment_confirmation'
+            if stage_id.name == 'Pending Review':
+                # Should create template and change name here
+                mail_template_name = 'email_template_appointment_pending_review'
+            elif stage_id.name == 'Confirm':
+                mail_template_name = 'email_template_appointment_confirmation'
+            elif stage_id.name == 'Canceled':
+                # Should create template and change name here
+                mail_template_name = 'email_template_appointment_canceled'
 
-            # if email_template_name:
-            #     email_template_proxy = self.pool['email.template']
-            #     template_id = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'medical', email_template_name)[1]
-            #     map(lambda t: email_template_proxy.send_mail(cr, uid, template_id, t, True, context=context),ids)
+            if mail_template_name:
+                email_context = self.env.context.copy()
+                template_res = self.env['mail.template']
+                imd_res = self.env['ir.model.data']
+                template_id = imd_res.get_object_reference('medical_base', mail_template_name)[1]
+                template = template_res.browse(template_id)
+                template.with_context(email_context).send_mail(self.id, force_send=True)
 
         return result
 
