@@ -39,24 +39,13 @@ class MedicalAppointment(models.Model):
             return stage_ids[0]
         return False
 
-    def _read_group_stage_ids(self, cr, uid, ids, domain, read_group_order=None, access_rights_uid=None, context=None):
-        access_rights_uid = access_rights_uid or uid
-        stage_obj = self.pool.get('medical.appointment.stage')
-        order = stage_obj._order
-        # lame hack to allow reverting search, should just work in trivial case
-        if read_group_order == 'stage_id desc':
-            order = "%s desc" % order
+    def _read_group_stage_ids(self, stages, domain, order):
+        order = stages._order
         search_domain = []
         # perform search
-        stage_ids = stage_obj._search(cr, uid, search_domain, order=order, access_rights_uid=access_rights_uid, context=context)
-        result = stage_obj.name_get(cr, access_rights_uid, stage_ids, context=context)
-        # restore order of the search
-        result.sort(lambda x, y: cmp(stage_ids.index(x[0]), stage_ids.index(y[0])))
-        fold = {}
-
-        for stage in stage_obj.browse(cr, access_rights_uid, stage_ids, context=context):
-            fold[stage.id] = stage.fold or False
-            return result, fold
+        stage_ids = stages._search(search_domain, order=order, access_rights_uid=SUPERUSER_ID)
+        result = stages.browse(stage_ids)
+        return result
 
     @api.multi
     def name_get(self):
@@ -74,7 +63,7 @@ class MedicalAppointment(models.Model):
     patient_id = fields.Many2one('medical.patient', string='Patient', required=True, select=True, help='Patient Name')
     appointment_date = fields.Datetime(string='Date and Time', required=True, default=fields.Datetime.now)
     date_end = fields.Datetime(string='do not display')
-    duration = fields.Float('Duration', default=1.00, required=True)
+    duration = fields.Float('Duration', default=30.00, required=True)
     physician_id = fields.Many2one('medical.physician', string='Physician', select=True, required=True, help='Physician\'s Name')
     alias = fields.Char(size=256, string='Alias')
     comments = fields.Text(string='Comments')
@@ -84,11 +73,11 @@ class MedicalAppointment(models.Model):
     consultations = fields.Many2one(string='Consultation Service', comodel_name='product.product', required=True, ondelete="cascade", domain="[('type', '=', 'service')]")
     urgency = fields.Selection([('a', 'Normal'), ('b', 'Urgent'), ('c', 'Medical Emergency'), ], string='Urgency Level', default='a')
     specialty_id = fields.Many2one('medical.specialty', string='Specialty', help='Medical Specialty / Sector')
-    stage_id = fields.Many2one('medical.appointment.stage', 'Stage', track_visibility='onchange', default=lambda self: self._get_default_stage_id())
+    stage_id = fields.Many2one('medical.appointment.stage', 'Stage', track_visibility='onchange', default=lambda self: self._get_default_stage_id(), group_expand='_read_group_stage_ids')
     current_stage = fields.Integer(related='stage_id.sequence', string='Current Stage')
     history_ids = fields.One2many('medical.appointment.history', 'appointment_id', 'History lines')
 
-    _group_by_full = {'stage_id': _read_group_stage_ids}
+    # _group_by_full = {'stage_id': _read_group_stage_ids}
 
     def _get_appointments(self, cr, uid, physician_ids, institution_ids, date_start, date_end, context=None):
         # """ Get appointments between given dates, excluding pending reviewand cancelled ones """
@@ -176,9 +165,10 @@ class MedicalAppointment(models.Model):
             return True
 
     def write(self, values):
-        # original_values = self.read(['physician_id', 'institution_id', 'appointment_date', 'date_end', 'duration'])[0]
-        # date_start = values.get('appointment_date', original_values['appointment_date'])
-        # _logger.info('KIMCHI')
+        context = self._context or {}
+        original_values = self.read(['physician_id', 'institution_id', 'appointment_date', 'date_end', 'duration'])[0]
+        date_start = values.get('appointment_date', original_values['appointment_date'])
+        
         result = super(MedicalAppointment, self).write(values)
 
         # stage change: update date_last_stage_update
@@ -192,23 +182,18 @@ class MedicalAppointment(models.Model):
             }
             appointment_history.create(val_history)
 
-            # user_record = self.env['res.users'].browse(SUPERUSER_ID)
-            # lang_id = self.env['res.lang'].browse(SUPERUSER_ID, [('code', '=', user_record.lang)])
-            # lang_record = self.env['res.lang'].browse(SUPERUSER_ID, lang_id)[0]
-
-            # localized_datetime = fields.Datetime.context_timestamp(datetime.strptime(date_start, DEFAULT_SERVER_DATETIME_FORMAT))
-            # context['appointment_date'] = localized_datetime.strftime(lang_record.date_format)
-            # context['appointment_time'] = localized_datetime.strftime(lang_record.time_format)
+            user_record = self.env['res.users'].browse(SUPERUSER_ID)
+            lang_id = self.env['res.lang'].search([('code', '=', user_record.lang)])
+            localized_datetime = datetime.strptime(date_start, DEFAULT_SERVER_DATETIME_FORMAT)
+            context.update({'appointment_date': localized_datetime.strftime(lang_id.date_format), 'appointment_time': localized_datetime.strftime(lang_id.time_format)})
 
             mail_template_name = None
 
             if stage_id.name == 'Pending Review':
-                # Should create template and change name here
                 mail_template_name = 'email_template_appointment_pending_review'
             elif stage_id.name == 'Confirm':
                 mail_template_name = 'email_template_appointment_confirmation'
             elif stage_id.name == 'Canceled':
-                # Should create template and change name here
                 mail_template_name = 'email_template_appointment_canceled'
 
             if mail_template_name:

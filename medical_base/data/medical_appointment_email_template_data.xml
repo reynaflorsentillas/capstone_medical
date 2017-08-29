@@ -47,7 +47,7 @@
                             </table>
                         </div>
 
-                        <div class="row"></div>
+                        <br/>
 
                         <p>Best Regards,</p>
                         <p>${object.institution_id.name} Team</p>
@@ -99,7 +99,7 @@
                             </table>
                         </div>
 
-                        <div class="row"></div>
+                        <br/>
                         
                         <p>Best Regards,</p>
                         <p>${object.institution_id.name} Team</p>
@@ -151,7 +151,7 @@
                             </table>
                         </div>
 
-                        <div class="row"></div>
+                        <br/>
                         
                         <p>Best Regards,</p>
                         <p>${object.institution_id.name} Team</p>
