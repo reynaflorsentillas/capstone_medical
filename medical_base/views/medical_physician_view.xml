@@ -19,10 +19,14 @@
             <field name="model">medical.physician</field>
             <field name="arch" type="xml">
                 <form string="Medical Physician" >
-                    <header/>
+                    <header>
+                        <button name="%(medical_physician_unavailable_wizard_act)d" type="action" string="Block Off Schedule"/>
+                    </header>
                     <sheet>
-                        <field name="image" widget='image' class="oe_avatar pull-left"
-                               options='{"preview_image": "image_medium", }'/>
+                        <div class="oe_button_box o_full" name="button_box" />
+
+                        <field name="image" widget='image' class="oe_avatar pull-left" options='{"preview_image": "image_medium", }'/>
+                        
                         <div class="oe_title">
                             <h1>
                                 <field name="name" placeholder="Physician's Name" />

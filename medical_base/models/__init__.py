@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+from . import medical_constants
 from . import res_partner
 from . import product_product
 from . import medical_specialty

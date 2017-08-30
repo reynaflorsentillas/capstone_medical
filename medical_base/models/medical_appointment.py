@@ -6,6 +6,8 @@ from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 import time
 from datetime import datetime
 
+from odoo.exceptions import UserError
+
 import logging
 _logger = logging.getLogger(__name__)
 
@@ -63,7 +65,7 @@ class MedicalAppointment(models.Model):
     patient_id = fields.Many2one('medical.patient', string='Patient', required=True, select=True, help='Patient Name')
     appointment_date = fields.Datetime(string='Date and Time', required=True, default=fields.Datetime.now)
     date_end = fields.Datetime(string='do not display')
-    duration = fields.Float('Duration', default=30.00, required=True)
+    duration = fields.Float('Duration', default=01.00, required=True)
     physician_id = fields.Many2one('medical.physician', string='Physician', select=True, required=True, help='Physician\'s Name')
     alias = fields.Char(size=256, string='Alias')
     comments = fields.Text(string='Comments')
@@ -77,13 +79,11 @@ class MedicalAppointment(models.Model):
     current_stage = fields.Integer(related='stage_id.sequence', string='Current Stage')
     history_ids = fields.One2many('medical.appointment.history', 'appointment_id', 'History lines')
 
-    # _group_by_full = {'stage_id': _read_group_stage_ids}
-
-    def _get_appointments(self, cr, uid, physician_ids, institution_ids, date_start, date_end, context=None):
+    def _get_appointments(self, physician_ids, institution_ids, date_start, date_end):
         # """ Get appointments between given dates, excluding pending reviewand cancelled ones """
 
-        pending_review_id = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'medical', 'stage_appointment_in_review')[1]
-        cancelled_id = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'medical', 'stage_appointment_canceled')[1]
+        pending_review_id = self.env['ir.model.data'].get_object_reference('medical_base', 'stage_appointment_in_review')[1]
+        cancelled_id = self.env['ir.model.data'].get_object_reference('medical_base', 'stage_appointment_canceled')[1]
         
         domain = [('physician_id', 'in', physician_ids),
                   ('date_end', '>', date_start),
@@ -93,15 +93,15 @@ class MedicalAppointment(models.Model):
         if institution_ids:
             domain += [('institution_id', 'in', institution_ids)]
 
-        return self.search(cr, uid, domain, context=context)
+        return self.search(domain)
 
-    def _set_clashes_state_to_review(self, cr, uid, physician_ids, institution_ids, date_start, date_end, context=None):
-        dummy, review_stage_id = self.pool['ir.model.data'].get_object_reference(cr, uid, 'medical', 'stage_appointment_in_review')
+    def _set_clashes_state_to_review(self, physician_ids, institution_ids, date_start, date_end):
+        dummy, review_stage_id = self.env['ir.model.data'].get_object_reference('medical_base', 'stage_appointment_in_review')
         if not review_stage_id:
-            raise orm.except_orm(_('Error!'), _('No default stage defined for review'))
-        current_appointments = self._get_appointments(cr, uid, physician_ids, institution_ids, date_start, date_end, context=context)
+            raise UserError(_('Error!'), _('No default stage defined for review'))
+        current_appointments = self._get_appointments(physician_ids, institution_ids, date_start, date_end)
         if current_appointments:
-            self.write(cr, uid, current_appointments, {'stage_id': review_stage_id})
+            self.write(current_appointments, {'stage_id': review_stage_id})
 
     @api.model
     def create(self, values):
