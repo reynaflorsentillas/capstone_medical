@@ -49,6 +49,7 @@
     # only loaded in demonstration mode
     'demo': [
         'demo/demo.xml',
+        'demo/partners.xml',
     ],
     'installable': True,
     'application': True,

@@ -135,6 +135,7 @@ class MedicalAppointment(models.Model):
     def _get_physician_specialty(self):
         for r in self:
             r.specialty_id = r.physician_id.specialty_id
+            r.institution_id = r.physician_id.institution_id
 
     # TO BE MOVED TO VISIT MODULE
     @api.multi

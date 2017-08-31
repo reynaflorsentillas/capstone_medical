@@ -9,7 +9,8 @@
                     <field name="name" />
                     <field name="code" />
                     <field name="specialty_id" />
-                    <field name="parent_id" />
+                    <!--<field name="parent_id" />-->
+                    <field name="institution_id" />
                 </tree>
             </field>
         </record>
@@ -19,15 +20,13 @@
             <field name="model">medical.physician</field>
             <field name="arch" type="xml">
                 <form string="Medical Physician" >
-                    <header>
-                        <!--<button name="%(medical_physician_unavailable_wizard_act)d" type="action" string="Block Off Schedule"/>-->
-                    </header>
+                    <header />
                     <sheet>
                         <div class="oe_button_box o_full" name="button_box" />
 
-                        <field name="image" widget='image' class="oe_avatar pull-left" options='{"preview_image": "image_medium", }'/>
+                        <field name="image" widget='image' class="oe_left oe_avatar" options='{"preview_image": "image_medium", }'/>
                         
-                        <div class="oe_title">
+                        <div class="oe_title" name="title">
                             <h1>
                                 <field name="name" placeholder="Physician's Name" />
                             </h1>
@@ -36,11 +35,12 @@
                             </h3> 
                         </div>
                         <group>
-                            <field name="ref" string="Legal ID"/>
-                            <field name="code" string="Internal ID"/>
-                            <field name="specialty_id"/>
-                            <field name="parent_id" />
-                            <field name="info" colspan="4"/>
+                            <field name="ref" string="Legal ID" />
+                            <field name="code" string="Internal ID" />
+                            <field name="specialty_id" />
+                            <!--<field name="parent_id" />-->
+                            <field name="institution_id" />
+                            <field name="info" colspan="4" />                    
                         </group>
                         <notebook>
                             <page string="General Information">
@@ -73,6 +73,64 @@
                                      <field name="lang" colspan="2"/>
                                      <field name="opt_out" string="I don't want to receive comercial messages" colspan="2"/>
                                  </group>
+                            </page>
+                            <page string="Schedules">
+                                <group>
+                                    <field name="schedule_template_ids" nolabel="1">
+                                        <form>
+                                            <sheet>
+                                                <group>
+                                                    <field name="physician_id" />
+                                                    <field name="day" />
+                                                    <field name="start_hour" />
+                                                    <field name="start_minute" />
+                                                    <field name="end_hour" />
+                                                    <field name="end_minute" />
+                                                    <field name="duration" />
+                                                </group>
+                                            </sheet>
+                                        </form>
+                                        <tree>
+                                            <field name="physician_id" />
+                                            <field name="day" />
+                                            <field name="start_hour" />
+                                            <field name="start_minute" />
+                                            <field name="end_hour" />
+                                            <field name="end_minute" />
+                                            <field name="duration" />
+                                        </tree>
+                                    </field>
+                                </group>
+                            </page>
+                            <page string="Services">
+                                <field name="service_ids">
+                                    <form>
+                                        <sheet>
+                                            <group>
+                                                <field name="physician_id" invisible="1" />
+                                                <field name="product_id" />
+                                                <field name="service_duration" />
+                                            </group>
+                                        </sheet>
+                                    </form>
+                                    <tree>
+                                        <field name="physician_id" invisible="1" />
+                                        <field name="product_id" />
+                                        <field name="service_duration" />
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Other Info">
+                                <group name="entity_data">
+                                    <field name="is_insurance_company" />
+                                    <field name="is_institution" />
+                                    <field name="is_doctor" />
+                                    <field name="is_patient" />
+                                    <field name="is_person" />
+                                    <field name="is_school" />
+                                    <field name="is_pharmacy" />
+                                    <field name="is_work" />
+                                </group>
                             </page>
                         </notebook>
                      </sheet>

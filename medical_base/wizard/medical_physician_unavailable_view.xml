@@ -8,8 +8,8 @@
             <field name="arch" type="xml">
                 <form>
                     <group>
-                        <field name="physician_id" />
-                        <field name="institution_id" />
+                        <field name="physician_id" widget="selection" />
+                        <field name="institution_id" widget="selection" />
                         <field name="date_start" />
                         <field name="date_end" />
                     </group>
