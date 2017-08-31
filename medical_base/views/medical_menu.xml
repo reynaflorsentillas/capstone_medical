@@ -34,6 +34,12 @@
                   sequence="10"
                   action="medical_appointment_action" />
 
+        <menuitem id="medical_appointment_block_off_schedule"
+                  name=" Block Off Schedule"
+                  parent="medical_appointment_root"
+                  sequence="20"
+                  action="medical_physician_unavailable_wizard_act" />
+
         <!--Configurations-->
 
         <menuitem id="medical_root_sub"

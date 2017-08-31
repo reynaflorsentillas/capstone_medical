@@ -60,6 +60,7 @@
                                         <field name="consultations" />
                                         <field name="appointment_date"/>
                                         <field name="duration" widget="float_time"/>
+                                        <field name="date_end" />
                                     </group>
                                 </group>
                                 <group col="4" colspan="4" string="Notes">

@@ -4,19 +4,16 @@ from odoo import SUPERUSER_ID
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from odoo.exceptions import UserError
+
+import math
 
 import logging
 _logger = logging.getLogger(__name__)
 
 class MedicalAppointmentStage(models.Model):
-    # """ Model for case stages. This models the main stages of an appointment
-    #     management flow. Main CRM objects (leads, opportunities, project
-    #     issues, ...) will now use only stages, instead of state and stages.
-    #     Stages are for example used to display the kanban view of records.
-    # """
     _name = "medical.appointment.stage"
     _description = "Stage of Appointment"
     _rec_name = 'name'
@@ -58,14 +55,13 @@ class MedicalAppointment(models.Model):
         return res
 
     name = fields.Char(string='Appointment ID', required=True, copy=False, readonly=True, index=True, default=lambda self: _('New'))
-    # name = fields.Char(string='Appointment ID', required=True)
     STATES = {'draft': [('readonly', False)]}
 
     user_id = fields.Many2one('res.users', 'Responsible', readonly=True, default=lambda self: self.env.user, states=STATES)
     patient_id = fields.Many2one('medical.patient', string='Patient', required=True, select=True, help='Patient Name')
     appointment_date = fields.Datetime(string='Date and Time', required=True, default=fields.Datetime.now)
-    date_end = fields.Datetime(string='do not display')
-    duration = fields.Float('Duration', default=01.00, required=True)
+    date_end = fields.Datetime(string='End Date and Time', compute='compute_appointment_date_end', store=True)
+    duration = fields.Float('Duration', default=01.00, required=True, help='The duration will be how long the appointment will take. Should be in format: hour:minute.')
     physician_id = fields.Many2one('medical.physician', string='Physician', select=True, required=True, help='Physician\'s Name')
     alias = fields.Char(size=256, string='Alias')
     comments = fields.Text(string='Comments')
@@ -79,8 +75,22 @@ class MedicalAppointment(models.Model):
     current_stage = fields.Integer(related='stage_id.sequence', string='Current Stage')
     history_ids = fields.One2many('medical.appointment.history', 'appointment_id', 'History lines')
 
+    @api.multi
+    @api.depends('appointment_date', 'duration')
+    def compute_appointment_date_end(self):
+        for record in self:
+            duration = record.duration
+            factor = duration < 0 and -1 or 1    
+            val = abs(duration)    
+            hour, minute = (factor * int(math.floor(val)), int(round((val % 1) * 60)))
+
+            appointment_date = datetime.strptime(record.appointment_date, '%Y-%m-%d %H:%M:%S')
+            
+            date_end = appointment_date + timedelta(hours=hour, minutes=minute)
+            record.date_end = date_end
+
     def _get_appointments(self, physician_ids, institution_ids, date_start, date_end):
-        # """ Get appointments between given dates, excluding pending reviewand cancelled ones """
+        # """ Get appointments between given dates, excluding pending review and cancelled ones """
 
         pending_review_id = self.env['ir.model.data'].get_object_reference('medical_base', 'stage_appointment_in_review')[1]
         cancelled_id = self.env['ir.model.data'].get_object_reference('medical_base', 'stage_appointment_canceled')[1]
@@ -93,15 +103,17 @@ class MedicalAppointment(models.Model):
         if institution_ids:
             domain += [('institution_id', 'in', institution_ids)]
 
-        return self.search(domain)
+        result = self.search(domain)
+
+        return result
 
     def _set_clashes_state_to_review(self, physician_ids, institution_ids, date_start, date_end):
-        dummy, review_stage_id = self.env['ir.model.data'].get_object_reference('medical_base', 'stage_appointment_in_review')
+        review_stage_id = self.env['ir.model.data'].get_object_reference('medical_base', 'stage_appointment_in_review')[1]
         if not review_stage_id:
-            raise UserError(_('Error!'), _('No default stage defined for review'))
+            raise UserError(_('No default stage defined for review'))
         current_appointments = self._get_appointments(physician_ids, institution_ids, date_start, date_end)
         if current_appointments:
-            self.write(current_appointments, {'stage_id': review_stage_id})
+            current_appointments.write({'stage_id': review_stage_id})
 
     @api.model
     def create(self, values):
@@ -149,8 +161,6 @@ class MedicalAppointment(models.Model):
                     'res_model': 'medical.visit',
                     'res_id': visit_id.id,
                     'view_id': self.env.ref('medical.medical_visit_form').id,
-                    # 'domain': "[('type','in',('out_invoice', 'out_refund'))]",
-                    # 'context': "{'type':'out_invoice', 'journal_type': 'sale'}",
                     'target': 'current',
                 }
 
@@ -165,7 +175,7 @@ class MedicalAppointment(models.Model):
             return True
 
     def write(self, values):
-        context = self._context or {}
+        context = self.env.context.copy()
         original_values = self.read(['physician_id', 'institution_id', 'appointment_date', 'date_end', 'duration'])[0]
         date_start = values.get('appointment_date', original_values['appointment_date'])
         
@@ -197,12 +207,11 @@ class MedicalAppointment(models.Model):
                 mail_template_name = 'email_template_appointment_canceled'
 
             if mail_template_name:
-                email_context = self.env.context.copy()
                 template_res = self.env['mail.template']
                 imd_res = self.env['ir.model.data']
                 template_id = imd_res.get_object_reference('medical_base', mail_template_name)[1]
                 template = template_res.browse(template_id)
-                template.with_context(email_context).send_mail(self.id, force_send=True)
+                template.with_context(context).send_mail(self.id, force_send=True)
 
         return result
 

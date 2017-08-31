@@ -20,7 +20,7 @@
             <field name="arch" type="xml">
                 <form string="Medical Physician" >
                     <header>
-                        <button name="%(medical_physician_unavailable_wizard_act)d" type="action" string="Block Off Schedule"/>
+                        <!--<button name="%(medical_physician_unavailable_wizard_act)d" type="action" string="Block Off Schedule"/>-->
                     </header>
                     <sheet>
                         <div class="oe_button_box o_full" name="button_box" />

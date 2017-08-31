@@ -33,11 +33,6 @@ class MedicalPhysicianUnavailableWizard(models.TransientModel):
         date_end = self.date_end
 
         # appointment_proxy._remove_empty_clashes([physician_id], institution_ids, date_start, date_end)
-        _logger.info('KONICHIWA')
-        _logger.info(physician_id)
-        _logger.info(institution_ids)
-        _logger.info(date_start)
-        _logger.info(date_end)
         appointment_proxy._set_clashes_state_to_review([physician_id], institution_ids, date_start, date_end)
 
         return {'type': 'ir.actions.act_window_close'}
