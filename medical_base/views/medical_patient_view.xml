@@ -44,7 +44,7 @@
                                  <field name="dod"/>
                                  <field name="age"/>
                                  <field name="gender"/>
-                                 <!--<field name="insurance_id" />-->
+                                 <field name="insurance_id" />
                             </group>
                         </group>
                         <notebook>

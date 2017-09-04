@@ -1,0 +1,31 @@
+<odoo>
+    <data>
+
+        <!-- Create New Hospital Information -->
+        <record id="hospital1" model="res.partner">
+            <field name="name">Marcopolo Institute of Health</field>
+            <field name="is_company">True</field>
+            <field name="street">3rd Floor Sunclare</field>
+            <field name="street2">21 Dreyer Street</field>
+            <field name="city">Claremont</field>
+            <!--<field name="country_id">base.ph</field>-->
+            <field name="phone">+325-6325842</field>
+            <field name="email">info@marcopolo.com</field>
+            <field name="is_institution">True</field>
+        </record>
+
+        <!-- Create New insurance Company Information -->
+        <record id="insurance1" model="res.partner">
+            <field name="name">Lombard Insurance Group</field>
+            <field name="is_company">True</field>
+            <field name="street">Ground Floor, Building C</field>
+            <field name="street2">Sunnyside Office Park,2 Carse O'Gowrie Road</field>
+            <field name="city">Parktown</field>
+            <!--<field name="country_id">base.ph</field>-->
+            <field name="phone">+325-5689871</field>
+            <field name="email">info@lombard.com</field>
+            <field name="is_insurance_company">True</field>
+        </record>
+
+    </data>
+</odoo>

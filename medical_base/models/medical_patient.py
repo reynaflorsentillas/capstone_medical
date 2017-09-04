@@ -32,7 +32,7 @@ class MedicalPatient(models.Model):
         ('outpatient','Outpatient'),
         ('hospitalized', 'Hospitalized'),
     ], readonly=True, string='Hospitalization Status')
-    # insurance_id = fields.Many2one('medical.insurance', string='Insurance', select=True)
+    insurance_id = fields.Many2one('medical.insurance', string='Insurance', select=True)
     marital_status = fields.Selection(
         selection=[
             ('s', 'Single'),

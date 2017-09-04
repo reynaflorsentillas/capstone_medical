@@ -8,3 +8,5 @@ from . import medical_physician
 from . import medical_patient_family
 from . import medical_patient
 from . import medical_appointment
+from . import medical_insurance
+from . import medical_insurance_plan

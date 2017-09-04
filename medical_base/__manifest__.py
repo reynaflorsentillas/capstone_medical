@@ -44,12 +44,14 @@
         'views/medical_patient_family_view.xml',
         'views/medical_patient_view.xml',
         'views/medical_appointment_view.xml',
+        'views/medical_insurance_view.xml',
+        'views/medical_insurance_plan_view.xml',
         'views/medical_menu.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
-        'demo/demo.xml',
-        'demo/partners.xml',
+        'demo/partners_demo.xml',
+        'demo/physician_demo.xml',
     ],
     'installable': True,
     'application': True,

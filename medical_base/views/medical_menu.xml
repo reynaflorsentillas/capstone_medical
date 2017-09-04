@@ -98,5 +98,22 @@
                   sequence="30"
                   action="medical_physician_action"
                   groups="group_medical_assistant" />
+
+        <!-- Insurances -->
+        <menuitem id="medical_root_insurance" 
+            name="Insurances"
+            parent="medical_root_sub" 
+            sequence="80" />
+
+        <menuitem id="medical_insurance_menu"
+            parent="medical_root_insurance" 
+            sequence="10"
+            action="medical_insurance_action" />
+
+        <menuitem id="medical_insurance_plan_menu"
+            parent="medical_root_insurance" 
+            sequence="20"
+            action="medical_insurance_plan_action" />
+            
     </data>
 </odoo>
