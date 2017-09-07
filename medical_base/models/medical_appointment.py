@@ -76,24 +76,13 @@ class MedicalAppointment(models.Model):
     history_ids = fields.One2many('medical.appointment.history', 'appointment_id', 'History lines')
 
     @api.multi
-    # @api.depends('consultations')
     @api.onchange('consultations')
     def compute_appointment_duration(self):
         for record in self:
             if record.consultations:
                 hours = record.consultations.service_duration_hours
                 minutes = record.consultations.service_duration_minutes
-                duration_str = str(hours) + '.' + str(minutes)
-                _logger.info('BUNENA')
-                _logger.info(hours)
-                _logger.info(minutes)
-                _logger.info(duration_str)
-                result = float(duration_str)
-                _logger.info(result)
-
-                # duration = int(round((int(minutes) % 1) / 60))
                 duration = float(int(hours) + int(minutes) / 60)
-                _logger.info(duration)
                 record.duration = duration
 
     @api.multi
