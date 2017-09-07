@@ -109,14 +109,18 @@
                                             <group>
                                                 <field name="physician_id" invisible="1" />
                                                 <field name="product_id" />
-                                                <field name="service_duration" />
+                                                <!--<field name="service_duration" />-->
+                                                <field name="service_duration_hours" />
+                                                <field name="service_duration_minutes" />
                                             </group>
                                         </sheet>
                                     </form>
                                     <tree>
                                         <field name="physician_id" invisible="1" />
                                         <field name="product_id" />
-                                        <field name="service_duration" />
+                                        <!--<field name="service_duration" />-->
+                                        <field name="service_duration_hours" />
+                                        <field name="service_duration_minutes" />
                                     </tree>
                                 </field>
                             </page>
@@ -194,6 +198,51 @@
             <field name="sequence" eval="10" />
             <field name="view_mode">tree</field>
             <field name="view_id" ref="medical_physician_view_tree" />
+        </record>
+
+        <!-- Physician Services -->
+        <record id="medical_physician_services_view_tree" model="ir.ui.view">
+            <field name="name">medical.physician.services.tree</field>
+            <field name="model">medical.physician.services</field>
+            <field name="arch" type="xml">
+                <tree string="Physician Services">
+                    <field name="physician_id" />
+                    <field name="product_id" />
+                    <!--<field name="service_duration" />-->
+                    <field name="service_duration_hours" />
+                    <field name="service_duration_minutes" />
+                </tree>
+            </field>
+        </record>
+
+        <record id="medical_physician_services_view_form" model="ir.ui.view">
+            <field name="name">medical.physician.services.form</field>
+            <field name="model">medical.physician.services</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header/>
+                    <sheet>
+                        <group>
+                            <field name="physician_id" />
+                            <field name="product_id" />
+                            <!--<field name="service_duration" />-->
+                            <field name="service_duration_hours" />
+                            <field name="service_duration_minutes" />
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="medical_physician_services_action">
+            <field name="name">Physician Services</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">medical.physician.services</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <!--<field name="search_view_id" ref="medical_physician_view_search" />-->
+            <field name="domain">[]</field>
+            <field name="context">{}</field>
         </record>
 
     </data>

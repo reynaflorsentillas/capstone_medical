@@ -22,7 +22,9 @@ class MedicalPhysicianServices(models.Model):
 
     product_id = fields.Many2one('product.product', 'Related Product', required=True, ondelete='restrict', help='Product related information for Appointment Type')
     physician_id = fields.Many2one('medical.physician', 'Physician', required=True, select=1, ondelete='cascade')
-    service_duration = fields.Selection(minutes, string='Duration')
+    # service_duration = fields.Selection(minutes, string='Duration')
+    service_duration_hours = fields.Selection(hours, string='Duration Hours')
+    service_duration_minutes = fields.Selection(minutes, string='Duration Minutes')
 
 class MedicalPhysicianScheduleTemplate(models.Model):
     '''

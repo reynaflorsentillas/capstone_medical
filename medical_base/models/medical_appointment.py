@@ -1,15 +1,15 @@
-from odoo import api, models, fields, _
+from __future__ import division
 
+from odoo import api, models, fields, _
 from odoo import SUPERUSER_ID
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 
 import time
 from datetime import datetime, timedelta
 
-from odoo.exceptions import UserError
-
 import math
 
+from odoo.exceptions import UserError
 import logging
 _logger = logging.getLogger(__name__)
 
@@ -67,13 +67,34 @@ class MedicalAppointment(models.Model):
     comments = fields.Text(string='Comments')
     appointment_type = fields.Selection([('ambulatory', 'Ambulatory'), ('outpatient', 'Outpatient'),('inpatient', 'Inpatient'), ], string='Type', default='outpatient')
     institution_id = fields.Many2one('res.partner', string='Health Center', help='Medical Center', domain="[('is_institution', '=', True)]")
-    # consultations = fields.Many2one('medical.physician.services', string='Consultation Services', help='Consultation Services', domain="[('physician_id', '=', physician_id)]")
-    consultations = fields.Many2one(string='Consultation Service', comodel_name='product.product', required=True, ondelete="cascade", domain="[('type', '=', 'service')]")
+    consultations = fields.Many2one('medical.physician.services', string='Consultation Services', help='Consultation Services', domain="[('physician_id', '=', physician_id)]")
+    # consultations = fields.Many2one(string='Consultation Service', comodel_name='product.product', required=True, ondelete="cascade", domain="[('type', '=', 'service')]")
     urgency = fields.Selection([('a', 'Normal'), ('b', 'Urgent'), ('c', 'Medical Emergency'), ], string='Urgency Level', default='a')
     specialty_id = fields.Many2one('medical.specialty', string='Specialty', help='Medical Specialty / Sector')
     stage_id = fields.Many2one('medical.appointment.stage', 'Stage', track_visibility='onchange', default=lambda self: self._get_default_stage_id(), group_expand='_read_group_stage_ids')
     current_stage = fields.Integer(related='stage_id.sequence', string='Current Stage')
     history_ids = fields.One2many('medical.appointment.history', 'appointment_id', 'History lines')
+
+    @api.multi
+    # @api.depends('consultations')
+    @api.onchange('consultations')
+    def compute_appointment_duration(self):
+        for record in self:
+            if record.consultations:
+                hours = record.consultations.service_duration_hours
+                minutes = record.consultations.service_duration_minutes
+                duration_str = str(hours) + '.' + str(minutes)
+                _logger.info('BUNENA')
+                _logger.info(hours)
+                _logger.info(minutes)
+                _logger.info(duration_str)
+                result = float(duration_str)
+                _logger.info(result)
+
+                # duration = int(round((int(minutes) % 1) / 60))
+                duration = float(int(hours) + int(minutes) / 60)
+                _logger.info(duration)
+                record.duration = duration
 
     @api.multi
     @api.depends('appointment_date', 'duration')

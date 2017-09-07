@@ -99,6 +99,12 @@
                   action="medical_physician_action"
                   groups="group_medical_assistant" />
 
+        <menuitem id="medical_physician_services"
+                  name=" Physician Services"
+                  parent="medical_conf_physicians"
+                  sequence="40"
+                  action="medical_physician_services_action" />
+
         <!-- Insurances -->
         <menuitem id="medical_root_insurance" 
             name="Insurances"
