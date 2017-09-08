@@ -14,11 +14,9 @@
 
     <data>
         <function model="ir.model.fields" name="formbuilder_whitelist">
-            <value>medical.appointment</value>
+            <value>medical.appointment.request</value>
             <value eval="[
                 'new_patient',
-                'physician_id',
-                'consultations',
             ]"/>
         </function>
     </data>

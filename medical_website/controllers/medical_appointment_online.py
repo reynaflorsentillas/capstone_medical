@@ -1,5 +1,6 @@
 import odoo.http as http
-# from odoo.addons.website_form.controllers.main import WebsiteForm
+from odoo.http import request
+import werkzeug
 
 class AppointmentOnline(http.Controller):
 
@@ -9,22 +10,18 @@ class AppointmentOnline(http.Controller):
         Consultations = http.request.env['medical.physician.services']
         return http.request.render('medical_website.appointmentonline', {
             'physicians': Physicians.search([]),
-            # 'consultations': Consultations.search([('type', '=', 'service')])
             'consultations': Consultations.search([])
         })
-    
-    # @http.route('/website_form/<string:model_name>', type='http', auth="public", methods=['POST'], website=True)
-    # def website_form(self, model_name, **kwargs):
-    #     if http.request.params.get('partner_email'):
-    #         Partner = http.request.env['res.partner'].sudo().search([('email', '=', kwargs.get('partner_email'))], limit=1)
-    #         if Partner:
-    #             http.request.params['partner_id'] = Partner.id
-    #     return super(AppointmentOnline, self).website_form(model_name, **kwargs)
 
     @http.route('/page/appointment/create', type='http', auth="public", methods=['POST'], website=True)
-    def create_appointment(self, **kw):
-        return request.redirect("/page/appointment/thankyou")
+    def create_appointment(self, new_patient, physician_id, consultations, **post):
+        new_appointment_request = request.env['medical.appointment'].create({
+            'new_patient': new_patient,
+            # 'physician_id': physician_id,
+            # 'consultations': consultations,
+        })
+        return werkzeug.utils.redirect("/page/appointment/create/thankyou")
 
-    @http.route('/page/appointment/thankyou', type='http', auth="public", website=True)
+    @http.route('/page/appointment/create/thankyou', type='http', auth="public", website=True)
     def thankyou(self, **kw):
         return http.request.render('medical_website.thankyou', {})
