@@ -24,7 +24,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'product', 'web', 'website', 'im_livechat',],
+    'depends': ['base', 'product'],
 
     # always loaded
     'data': [
@@ -35,7 +35,6 @@
         'data/medical_ethnic_group_data.xml',
         'data/medical_appointment_stage_data.xml',
         'data/medical_appointment_email_template_data.xml',
-        'data/website_data.xml',
         'wizard/medical_physician_unavailable_view.xml',
         'views/res_partner_view.xml',
         'views/product_product_view.xml',
@@ -45,7 +44,7 @@
         'views/medical_patient_family_view.xml',
         'views/medical_patient_view.xml',
         'views/medical_appointment_view.xml',
-        'views/medical_appointment_online_view.xml',
+        
         'views/medical_insurance_view.xml',
         'views/medical_insurance_plan_view.xml',
         'views/medical_menu.xml',

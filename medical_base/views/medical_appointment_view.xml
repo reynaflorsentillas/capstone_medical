@@ -43,6 +43,7 @@
                         <div class="oe_right oe_button_box" name="buttons"/>
                         <group col="4" colspan="4">
                             <field name="patient_id"/>
+                            <field name="new_patient" />
                             <field name="alias" />
                             <field name="appointment_type" />
                             <field name="urgency" />
