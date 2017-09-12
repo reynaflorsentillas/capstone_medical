@@ -19,12 +19,13 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'website_form'],
+    'depends': ['base', 'medical_base', 'website_form'],
 
     # always loaded
     'data': [
         'security/ir.model.access.csv',
         'data/website_data.xml',
+        'views/medical_appointment_view.xml',
         'views/medical_appointment_online_view.xml',
     ],
     # only loaded in demonstration mode

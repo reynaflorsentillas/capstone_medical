@@ -60,11 +60,12 @@ class MedicalAppointment(models.Model):
     user_id = fields.Many2one('res.users', 'Responsible', readonly=True, default=lambda self: self.env.user, states=STATES)
     patient_id = fields.Many2one('medical.patient', string='Patient', required=False, select=True, help='Patient Name')
     # patient_id = fields.Many2one('medical.patient', string='Patient', select=True, help='Patient Name')
-    new_patient = fields.Char(string='Patient')
-    appointment_date = fields.Datetime(string='Date and Time', required=False, default=fields.Datetime.now)
+    patient_email = fields.Char(string='Email')
+    patient_phone = fields.Char(string='Phone')
+    appointment_date = fields.Datetime(string='Date and Time', required=True, default=fields.Datetime.now)
     date_end = fields.Datetime(string='End Date and Time', compute='compute_appointment_date_end', store=True)
-    duration = fields.Float('Duration', default=01.00, required=False, help='The duration will be how long the appointment will take. Should be in format: hour:minute.')
-    physician_id = fields.Many2one('medical.physician', string='Physician', select=True, required=False, help='Physician\'s Name')
+    duration = fields.Float('Duration', default=01.00, required=True, help='The duration will be how long the appointment will take. Should be in format: hour:minute.')
+    physician_id = fields.Many2one('medical.physician', string='Physician', select=True, required=True, help='Physician\'s Name')
     alias = fields.Char(size=256, string='Alias')
     comments = fields.Text(string='Comments')
     appointment_type = fields.Selection([('ambulatory', 'Ambulatory'), ('outpatient', 'Outpatient'),('inpatient', 'Inpatient'), ], string='Type', default='outpatient')
@@ -86,6 +87,14 @@ class MedicalAppointment(models.Model):
                 minutes = record.consultations.service_duration_minutes
                 duration = float(int(hours) + int(minutes) / 60)
                 record.duration = duration
+
+    @api.multi
+    @api.onchange('patient_id')
+    def set_patient_details(self):
+        for record in self:
+            if record.patient_id:
+                record.patient_email = record.patient_id.email
+                record.patient_phone = record.patient_id.phone
 
     @api.multi
     @api.depends('appointment_date', 'duration')

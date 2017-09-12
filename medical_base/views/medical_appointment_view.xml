@@ -41,16 +41,21 @@
                         </div>
 
                         <div class="oe_right oe_button_box" name="buttons"/>
-                        <group col="4" colspan="4">
-                            <field name="patient_id"/>
-                            <field name="new_patient" />
-                            <field name="alias" />
-                            <field name="appointment_type" />
-                            <field name="urgency" />
-                            <field name="current_stage" invisible="1" />
+                        <group>
+                            <group string="Patient Info">
+                                <field name="patient_id" required="1" />
+                                <field name="patient_email" />
+                                <field name="patient_phone" />
+                            </group>
+                            <group string="Other Info">
+                                <field name="alias" />
+                                <field name="appointment_type" />
+                                <field name="urgency" />
+                                <field name="current_stage" invisible="1" />
+                            </group>
                         </group>
                         <notebook>
-                            <page string="Main">
+                            <page string="General Info">
                                 <group >
                                     <group> 
                                         <field name="physician_id" />

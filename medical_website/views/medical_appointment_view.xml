@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record id="view_medical_appointment_form_extend" model="ir.ui.view">
+            <field name="name">medical.apppointment.form.extend</field>
+            <field name="model">medical.appointment</field>
+            <field name="priority" eval="8" />
+            <field name="inherit_id" ref="medical_base.medical_appointment_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='patient_id']" position="after">
+                    <field name="is_new_patient" attrs="{'invisible': [('is_new_patient', '=', False)]}" />
+                    <field name="new_patient" attrs="{'invisible': [('is_new_patient', '=', False)]}" />
+                </xpath>
+                <xpath expr="//field[@name='patient_id']" position="attributes">
+                    <!--<attribute name="attrs">{'required': [('is_new_patient', '=', False)]}</attribute>-->
+                    <attribute name="attrs">{'invisible': [('is_new_patient', '=', True)], 'required': [('is_new_patient', '=', False)]}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='patient_email']" position="attributes">
+                    <attribute name="attrs">{'invisible': [('is_new_patient', '=', False)]}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='patient_phone']" position="attributes">
+                    <attribute name="attrs">{'invisible': [('is_new_patient', '=', False)]}</attribute>
+                </xpath>
+            </field>
+        </record>
+
+
+    </data>
+</odoo>
