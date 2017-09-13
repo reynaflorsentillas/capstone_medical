@@ -43,7 +43,7 @@
                         <div class="oe_right oe_button_box" name="buttons"/>
                         <group>
                             <group string="Patient Info">
-                                <field name="patient_id" required="1" />
+                                <field name="patient_id" />
                                 <field name="patient_email" />
                                 <field name="patient_phone" />
                             </group>
